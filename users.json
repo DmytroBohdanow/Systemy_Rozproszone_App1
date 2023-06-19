@@ -1,0 +1,37 @@
+{
+  "users": [
+    {
+      "0": "0",
+      "userId": "",
+      "username": "user1",
+      "password": "password1",
+      "balance": "0",
+      "accountType": "customer",
+      "firstName": "",
+      "lastName": "",
+      "PESEL": ""
+    },
+    {
+      "username": "user2",
+      "password": "password2",
+      "balance": 2300,
+      "accountType": "customer",
+      "firstName": "",
+      "lastName": "",
+      "PESEL": ""
+    },
+    {
+      "username": "user3",
+      "password": "password3",
+      "balance": 1000,
+      "accountType": "customer",
+      "firstName": "",
+      "lastName": "",
+      "PESEL": ""
+    }
+  ],
+  "admins": [
+    { "username": "admin1", "password": "adminpass1", "accountType": "admin" },
+    { "username": "admin2", "password": "adminpass2", "accountType": "admin" }
+  ]
+}

@@ -1,10 +1,11 @@
 import express from 'express';
 import { userRoute } from './userRoute.js';
-import { loginRoute } from './loginRoute.js';
+import { loginApiRoute } from './loginApiRoute.js';
 import { adminRoute } from './adminRoute.js';
-
+import { transferApiRoute } from './transferApiRoute.js';
 export const routes = express.Router();
 
 routes.use(userRoute);
-routes.use(loginRoute);
+routes.use(loginApiRoute);
 routes.use(adminRoute);
+routes.use(transferApiRoute);
