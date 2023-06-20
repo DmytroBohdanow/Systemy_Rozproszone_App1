@@ -10,17 +10,12 @@ export const AuthProvider = ({ children, userData }) => {
   // call this function when you want to authenticate the user
   const login = (data) => {
     setUser(data);
-    console.log(user)
     if(data.accountType === "admin") {
       navigate("/admin");
     } else {
       navigate("/customer");
     }
   };
-
-  const refreshUserData = (data) => {
-    setUser(data);
-  }
 
   // call this function to sign out logged in user
   const logout = () => {
@@ -31,6 +26,7 @@ export const AuthProvider = ({ children, userData }) => {
   const value = useMemo(
     () => ({
       user,
+      setUser,
       login,
       logout
     }),

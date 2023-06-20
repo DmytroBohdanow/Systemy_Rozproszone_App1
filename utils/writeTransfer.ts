@@ -10,7 +10,6 @@ export function writeTransferToFile(newTransfer: Object) {
     // Read the existing JSON file
     const existingData = fs.readFileSync(path.join(__dirname, '/../transfers.json'), 'utf8');
     const existingObjects = JSON.parse(existingData);
-    console.log(existingData);
     // Add the new object to the existing objects
     existingObjects.transfers.push(newTransfer);
 
