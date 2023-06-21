@@ -28,3 +28,11 @@ export function findAdminByUsername(username: string) {
   // Return the found admins
   return admins;
 }
+
+export function getAllUsers() {
+
+}
+
+export function getAllAdmins() {
+  
+}
