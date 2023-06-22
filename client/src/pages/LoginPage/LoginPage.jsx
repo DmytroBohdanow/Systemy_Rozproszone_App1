@@ -75,9 +75,9 @@ const LoginPage = () => {
           Web Banking im. Bogusława Lęciny
         </Navbar.Brand>
       </Navbar>
-      <Card className="container mt-4" border="secondary">
-        <Card.Body>
-          <Form onSubmit={handleSubmit}>
+      <Card className="mt-4 container" border="secondary">
+        <Card.Body className="d-flex justify-content-center">
+          <Form onSubmit={handleSubmit} className="w-50">
             <Form.Group className="mb-3" controlId="username">
               <Form.Label>Username</Form.Label>
               <Form.Control
@@ -111,7 +111,7 @@ const LoginPage = () => {
             <Button variant="primary" type="submit">
               Login
             </Button>
-            {error.length > 0 ? <Alert variant="danger">{error}</Alert> : <></>}
+            {error.length > 0 ? <Alert variant="danger" className="mt-2">{error}</Alert> : <></>}
           </Form>
         </Card.Body>
       </Card>

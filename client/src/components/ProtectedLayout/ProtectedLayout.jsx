@@ -15,7 +15,7 @@ export const ProtectedLayout = () => {
 
   return (
     <>
-      <Navbar fill bg="dark" data-bs-theme="dark">
+      <Navbar bg="dark" data-bs-theme="dark">
         <Navbar.Brand className="p-2">
           <img
             alt=""
@@ -44,9 +44,14 @@ export const ProtectedLayout = () => {
           </Nav>
         </Navbar.Collapse>
       </Navbar>
-      <Navbar fixed="bottom" className="justify-content-center" data-bs-theme="light">
+      <Navbar className="justify-content-center" data-bs-theme="light">
             <Navbar.Text>
               Pieniądze nie dają szczęścia tylko luksus
+            </Navbar.Text>
+      </Navbar>
+      <Navbar fixed="bottom" className="justify-content-center mt-4" data-bs-theme="light">
+            <Navbar.Text>
+              (wdech).. ahhhh, czujesz ten zapach? Tak pachnie sto złotych (c)
             </Navbar.Text>
       </Navbar>
       {outlet}

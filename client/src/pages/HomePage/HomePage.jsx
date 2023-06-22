@@ -11,12 +11,9 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 
 const HomePage = () => {
-  const [newTransfer, setNewTransfer] = useState(false);
-  const [personalInfo, setPersonalInfo] = useState(false);
   const [transferValue, setTransferValue] = useState("");
   const [transferDestination, setTransferDestination] = useState("");
   const [transferResponse, setTransferResponse] = useState("");
-  const [topUp, setTopUp] = useState(false);
   const [topUpValue, setTopUpValue] = useState("");
   const [topUpResponse, setTopUpResponse] = useState("");
   const { user } = useAuth();
@@ -99,7 +96,7 @@ const HomePage = () => {
       topUpDate: new Date().toLocaleString("pl-PL", { timeZone: "UTC" }),
       type: "top up",
     };
-    console.log(topUp);
+
     await axios
       .post("/api/topup", topUp, {
         headers: {
