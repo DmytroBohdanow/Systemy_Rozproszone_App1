@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { findUserByUsername, getAllUsers } from "../../utils/getUser.js";
 import { addUser } from "../../utils/addUser.js";
+import { modifyUserFields } from "../../utils/modifyUserFields.js";
 export const usersApiRoute = Router();
 
 usersApiRoute.post("/api/users", (req: Request, res: Response) => {
@@ -26,4 +27,14 @@ usersApiRoute.post("/api/newuser", (req: Request, res: Response) => {
     addUser(req.body);
     res.status(200).json({ message: `User with username ${req.body.username} was added` });
   }
+});
+
+usersApiRoute.post("/api/user/edit", (req: Request, res: Response) => {
+  modifyUserFields(req.body.username, req.body);
+  res
+    .status(200)
+    .json({
+      message: `your personal information has been changed`,
+      user: findUserByUsername(req.body.username)[0]
+    });
 });

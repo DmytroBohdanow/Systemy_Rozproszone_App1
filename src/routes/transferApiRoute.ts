@@ -14,7 +14,7 @@ transferApiRoute.post("/api/transfer", (req: Request, res: Response) => {
   );
   if (req.body.transferDestination === req.body.transferSender) {
     res.json({
-      message: `Your transfer has not been processed. You can't send transfer to your own account`, user: findUserByUsername(req.body.transferSender)[0],
+      error: true, message: `Your transfer has not been processed. You can't send transfer to your own account`, user: findUserByUsername(req.body.transferSender)[0],
     });
     return;
   }
@@ -33,7 +33,7 @@ transferApiRoute.post("/api/transfer", (req: Request, res: Response) => {
       return;
   } else {
     res.json({
-      message: `Your transfer has not been processed. ${req.body.transferDestination} was not found`, user: findUserByUsername(req.body.transferSender)[0],
+      error: true, message: `Your transfer has not been processed. ${req.body.transferDestination} user was not found`, user: findUserByUsername(req.body.transferSender)[0],
     });
     return;
   }

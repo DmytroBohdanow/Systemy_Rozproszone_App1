@@ -77,7 +77,7 @@ export const DisplayNewAdminForm = (props) => {
   return (
     <Card className="mt-4 p-4 w-50 container" border="secondary">
       <Card.Title>
-        <h1>Create new admin</h1>
+        Create new admin
       </Card.Title>
       <Card.Body>
         <Form.Group className="mb-3" controlId="newAdminId">

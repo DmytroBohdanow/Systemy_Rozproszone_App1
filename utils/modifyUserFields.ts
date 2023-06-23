@@ -4,7 +4,6 @@ import { fileURLToPath } from "url";
 
 interface User {
   username: string;
-  // Add additional fields here
   balance?: number;
   password?: string;
   accountType?: string;

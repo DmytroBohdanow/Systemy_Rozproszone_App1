@@ -50,7 +50,6 @@ const LoginPage = () => {
         ) {
           setError("");
           login(response.data[0]);
-          console.log(response.data[0]);
         } else if (response.data[0].password !== password) {
           setError("Password incorrect");
           return null;
