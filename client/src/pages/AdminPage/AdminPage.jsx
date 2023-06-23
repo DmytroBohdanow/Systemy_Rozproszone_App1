@@ -111,10 +111,6 @@ const AdminPage = () => {
                     </tr>
                   </tbody>
                 </table>
-                <Button variant="warning">Change</Button>
-                <Button variant="danger" className="ms-3">
-                  Delete
-                </Button>
               </Card.Body>
             </Card>
           </div>
@@ -159,7 +155,6 @@ const AdminPage = () => {
                     </tr>
                   </tbody>
                 </table>
-                <Button variant="warning">Change</Button>
               </Card.Body>
             </Card>
           </div>
