@@ -7,6 +7,7 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
+import Modal from "react-bootstrap/Modal";
 import { DisplayNewAdminForm } from "./AdminForm";
 import { DisplayNewUserForm } from "./UserForm";
 
@@ -29,7 +30,10 @@ const AdminPage = () => {
   const [newUserError, setNewUserError] = useState("");
   const [newUserResponse, setNewUserResponse] = useState("");
   const [newAdminResponse, setNewAdminResponse] = useState("");
-
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState("");
+  const [userDeleteError, setUserDeleteError] = useState("");
+  const [afterDeleteMsg, setAfterDeleteMsg] = useState("");
   const radios = [
     { name: "Admin list", value: "1" },
     { name: "User list", value: "2" },
@@ -73,49 +77,163 @@ const AdminPage = () => {
       });
   };
 
+  useEffect(() => {
+    fetchCurrentAdminData();
+    fetchUsers();
+    fetchAdmins();
+  }, []);
+
+  useEffect(() => {
+    if (radioValue === "1") {
+      fetchCurrentAdminData();
+      fetchAdmins();
+    } else if (radioValue === "2") {
+      fetchUsers();
+    }
+  }, [radioValue]);
+
   const displayUsersList = () => {
+    const handleDeleteModalOpen = (username) => {
+      setUserToDelete(username);
+      setDeleteModal(true);
+    };
+
+    const handleDeleteModalClose = () => {
+      setDeleteModal(false);
+      setUserToDelete("");
+    };
+
+    const handleDeleteModalDelete = async (username) => {
+      await axios
+        .post(
+          "/api/user/delete",
+          { username: username },
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          }
+        )
+        .then((response) => {
+          if (response.error) {
+            setUserDeleteError(response.error);
+          } else {
+            fetchUsers();
+            handleDeleteModalClose();
+            setAfterDeleteMsg(response.data.message);
+
+            document
+              .getElementById("adminDataCard")
+              .scrollIntoView({ behavior: "smooth" });
+            setTimeout(() => {
+              setAfterDeleteMsg("");
+            }, 10000);
+          }
+        })
+        .catch((error) => {
+          setUserDeleteError(error);
+        });
+    };
+
     if (usersData.length > 0) {
-      return usersData.map((userData, index) => {
-        return (
-          <div key={"admin" + index}>
-            <Card className="w-50 container mt-4 mb-5" border="secondary">
-              <Card.Body>
-                <Card.Title className="mb-4">
-                  <h1>User #{index + 1}</h1>
-                </Card.Title>
-                <table className="table w-75">
-                  <tbody>
-                    <tr>
-                      <th scope="row">Username:</th>
-                      <td>{userData.username}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Unique ID:</th>
-                      <td>{userData.userId}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Account type:</th>
-                      <td>{userData.accountType}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">First name:</th>
-                      <td>{userData.firstName}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Last name:</th>
-                      <td>{userData.lastName}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">PESEL:</th>
-                      <td>{userData.PESEL}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </Card.Body>
-            </Card>
-          </div>
-        );
-      });
+      return (
+        <>
+          {afterDeleteMsg ? (
+            <Alert
+              variant="info"
+              className="mt-2 w-50 container"
+              id="afterDeleteMsg"
+            >
+              {afterDeleteMsg}
+            </Alert>
+          ) : (
+            <></>
+          )}
+          {usersData.map((userData, index) => {
+            return (
+              <div key={"user" + index}>
+                <Card className="w-50 container mt-4 mb-5" border="secondary">
+                  <Card.Body>
+                    <Card.Title className="mb-4">
+                      <h1>User #{index + 1}</h1>
+                    </Card.Title>
+                    <table className="table w-75">
+                      <tbody>
+                        <tr>
+                          <th scope="row">Username:</th>
+                          <td>{userData.username}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Unique ID:</th>
+                          <td>{userData.userId}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Account type:</th>
+                          <td>{userData.accountType}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">First name:</th>
+                          <td>{userData.firstName}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Last name:</th>
+                          <td>{userData.lastName}</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">PESEL:</th>
+                          <td>{userData.PESEL}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <Button
+                      variant="danger"
+                      type="button"
+                      onClick={() => handleDeleteModalOpen(userData.username)}
+                    >
+                      Delete
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </div>
+            );
+          })}
+          <Modal
+            show={deleteModal}
+            onHide={handleDeleteModalClose}
+            backdrop="static"
+            keyboard={false}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Delete {userToDelete}?</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Are you sure that you want to delete {userToDelete} user? IT'S
+              IRREVERSIBLE
+              {userDeleteError ? (
+                <Alert
+                  variant="danger"
+                  className="mt-2 w-50 justify-content-center"
+                >
+                  {userDeleteError}
+                </Alert>
+              ) : (
+                <></>
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleDeleteModalClose}>
+                Close
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => handleDeleteModalDelete(userToDelete)}
+              >
+                Delete
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      );
     } else {
       return (
         <Alert variant="warning" className="mt-2 w-50 justify-content-center">
@@ -169,22 +287,6 @@ const AdminPage = () => {
     }
   };
 
-
-  useEffect(() => {
-    fetchCurrentAdminData();
-    fetchUsers();
-    fetchAdmins();
-  }, []);
-
-  useEffect(() => {
-    if (radioValue === "1") {
-      fetchCurrentAdminData();
-      fetchAdmins();
-    } else if (radioValue === "2") {
-      fetchUsers();
-    }
-  }, [radioValue]);
-
   if (user.accountType !== "admin") {
     return <Navigate to="/customer" />;
   }
@@ -192,7 +294,7 @@ const AdminPage = () => {
   return (
     <>
       {currentAdminData ? (
-        <Card className="container mt-4" border="secondary">
+        <Card className="container mt-4" border="secondary" id="adminDataCard">
           <Card.Body>
             <Card.Title className="mb-4">
               <h1>Welcome {currentAdminData.username}!</h1>
@@ -240,7 +342,7 @@ const AdminPage = () => {
       ) : (
         <></>
       )}
-      {radioValue === "4" ? ( 
+      {radioValue === "4" ? (
         <DisplayNewUserForm
           newUserUsername={newUserUsername}
           setNewUserUsername={setNewUserUsername}

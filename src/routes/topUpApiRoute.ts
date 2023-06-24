@@ -16,7 +16,7 @@ topUpApiRoute.post("/api/topup", (req: Request, res: Response) => {
   if (topUpUser.length > 0) {
     writeTransferToFile(req.body);
     modifyUserFields(req.body.user, {
-      balance: parseInt(topUpUser[0].balance) + parseInt(req.body.topUpValue),
+      balance: parseInt(topUpUser[0].balance) + parseInt(req.body.transferValue),
     });
     res
       .status(200)

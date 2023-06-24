@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { findUserByUsername, getAllUsers } from "../../utils/getUser.js";
 import { addUser } from "../../utils/addUser.js";
 import { modifyUserFields } from "../../utils/modifyUserFields.js";
+import { deleteUserByUsername } from "../../utils/deleteUser.js";
 export const usersApiRoute = Router();
 
 usersApiRoute.post("/api/users", (req: Request, res: Response) => {
@@ -37,4 +38,12 @@ usersApiRoute.post("/api/user/edit", (req: Request, res: Response) => {
       message: `your personal information has been changed`,
       user: findUserByUsername(req.body.username)[0]
     });
+});
+
+usersApiRoute.post("/api/user/delete", (req: Request, res: Response) => {
+  deleteUserByUsername(req.body.username);
+  res
+    .status(200).json({
+    message: `user ${req.body.username} has been deleted`,
+  });
 });

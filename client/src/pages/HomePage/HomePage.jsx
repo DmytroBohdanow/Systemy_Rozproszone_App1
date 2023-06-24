@@ -27,6 +27,7 @@ const HomePage = () => {
   const [changePESELValue, setChangePESELValue] = useState("");
   const [changeResponse, setChangeResponse] = useState("");
   const [changeError, setChangeError] = useState(false);
+  const [transferHistory, setTransferHistory] = useState([]);
 
   const radios = [
     { name: "New transfer", value: "1" },
@@ -47,13 +48,31 @@ const HomePage = () => {
       });
   };
 
+  const fetchTransferHistory = async () => {
+    await axios
+      .post(
+        "/api/transfers/byuser",
+        { username: user.username },
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      )
+      .then((response) => {
+        setTransferHistory(response.data.transfers);
+      });
+  };
+
   useEffect(() => {
     fetchUserData();
+    fetchTransferHistory();
   }, []);
 
   useEffect(() => {
-    if (radioValue === "3") {
-      fetchUserData();
+    fetchUserData();
+    if (radioValue === "1") {
+      fetchTransferHistory();
     }
   }, [radioValue]);
 
@@ -145,8 +164,8 @@ const HomePage = () => {
       transferSender: user.username,
       transferDestination: transferDestination,
       transferValue: transferValue,
-      balance: newBalance,
-      transferDate: new Date().toLocaleString("pl-PL", { timeZone: "UTC" }),
+      balance: userData.balance,
+      transferDate: new Date().toLocaleString("pl-PL"),
       type: "transfer",
     };
 
@@ -157,6 +176,7 @@ const HomePage = () => {
         },
       })
       .then((response) => {
+        fetchTransferHistory();
         setTransferValue("");
         setTransferDestination("");
         if (response.data.error) {
@@ -181,8 +201,10 @@ const HomePage = () => {
     const topUp = {
       transferId: uuidv4(),
       user: user.username,
-      topUpValue: topUpValue,
-      topUpDate: new Date().toLocaleString("pl-PL", { timeZone: "UTC" }),
+      transferSender: user.username,
+      transferDestination: user.username,
+      transferValue: topUpValue,
+      transferDate: new Date().toLocaleString("pl-PL"),
       type: "top up",
     };
 
@@ -264,47 +286,116 @@ const HomePage = () => {
           </Card>
 
           {radioValue === "1" ? (
-            <Card className="mt-4 p-4 container" border="secondary">
-              <Card.Title>New transfer</Card.Title>
-              <Card.Body>
-                <Form onSubmit={handleTransferSubmit} className="w-75">
-                  <Form.Group className="mb-3" controlId="transferDestination">
-                    <Form.Label>Transfer to:</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={transferDestination}
-                      onChange={handleDestinationChange}
-                      placeholder="Enter receiver username"
-                      required
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3 w-50" controlId="quote">
-                    <Form.Label>Quote</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Quote in zł"
-                      value={transferValue}
-                      onChange={handleTransferValueChange}
-                      required
-                    />
-                  </Form.Group>
-                  <Button variant="primary" type="submit">
-                    Send
-                  </Button>
-                  {transferResponse.length > 0 ? (
-                    <Alert
-                      variant={transferError ? "danger" : "info"}
-                      className="mt-2"
+            <>
+              <Card className="mt-4 p-4 w-50 container" border="secondary">
+                <Card.Title>New transfer</Card.Title>
+                <Card.Body>
+                  <Form onSubmit={handleTransferSubmit} className="w-75">
+                    <Form.Group
+                      className="mb-3"
+                      controlId="transferDestination"
                     >
-                      {transferResponse}
-                    </Alert>
-                  ) : (
-                    <></>
-                  )}
-                </Form>
-              </Card.Body>
-            </Card>
+                      <Form.Label>Transfer to:</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={transferDestination}
+                        onChange={handleDestinationChange}
+                        placeholder="Enter receiver username"
+                        required
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3 w-50" controlId="quote">
+                      <Form.Label>Quote</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Quote in zł"
+                        value={transferValue}
+                        onChange={handleTransferValueChange}
+                        required
+                      />
+                    </Form.Group>
+                    <Button variant="primary" type="submit">
+                      Send
+                    </Button>
+                    {transferResponse.length > 0 ? (
+                      <Alert
+                        variant={transferError ? "danger" : "info"}
+                        className="mt-2"
+                      >
+                        {transferResponse}
+                      </Alert>
+                    ) : (
+                      <></>
+                    )}
+                  </Form>
+                </Card.Body>
+              </Card>
+              ,<hr></hr>
+              {transferHistory
+                .sort((a, b) => {
+                  const aDate =
+                    a.transferDate.split(",")[0].split(".");
+                  const bDate =
+                    b.transferDate.split(",")[0].split(".");
+                  const aTime =
+                    a.transferDate.split(",")[1].trim().split(":");
+                  const bTime =
+                    b.transferDate.split(",")[1].trim().split(":");
+                  return (
+                    new Date(bDate[2], bDate[1], bDate[0], bTime[0], bTime[1], bTime[2]) -
+                    new Date(aDate[2], aDate[1], aDate[0], aTime[0], aTime[1], aTime[2])
+                  );
+                })
+                .map((transferData, index) => {
+                  return (
+                    <div key={"transfer" + index}>
+                      <Card
+                        className="w-50 container mt-4 mb-5"
+                        border="secondary"
+                      >
+                        <Card.Body>
+                          <Card.Title className="mb-4">
+                            <h1>
+                              Transfer from{" "}
+                              {transferData.transferDate.split(",")[0]}
+                            </h1>
+                          </Card.Title>
+                          {transferData.transferDestination === user.username ? <h3 className="bg-light text-success">Incoming transfer</h3> : <h3 className="bg-light text-danger">Outgoing transfer</h3>}
+                          <table className="table w-75">
+                            <tbody>
+                              <tr>
+                                <th scope="row">Transfer ID:</th>
+                                <td>{transferData.transferId}</td>
+                              </tr>
+                              <tr>
+                                <th scope="row">Transfer from:</th>
+                                <td>{transferData.transferSender}</td>
+                              </tr>
+                              <tr>
+                                <th scope="row">Transfer to:</th>
+                                <td>{transferData.transferDestination}</td>
+                              </tr>
+                              <tr>
+                                <th scope="row">Time and date:</th>
+                                <td>{transferData.transferDate}</td>
+                              </tr>
+                              <tr>
+                                <th scope="row">Quote:</th>
+                                <td>{transferData.transferValue} zł</td>
+                              </tr>
+                              <tr>
+                                <th scope="row">Transfer type:</th>
+                                <td>{transferData.type}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </Card.Body>
+                      </Card>
+                    </div>
+                  );
+                })}
+            </>
           ) : (
             <></>
           )}
@@ -451,7 +542,10 @@ const HomePage = () => {
                       />
                     </Form.Group>
                     {changeResponse.length > 0 ? (
-                      <Alert variant={changeError ? "danger" :"success"} className="mt-2">
+                      <Alert
+                        variant={changeError ? "danger" : "success"}
+                        className="mt-2"
+                      >
                         {changeResponse}
                       </Alert>
                     ) : (
